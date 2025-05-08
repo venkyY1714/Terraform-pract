@@ -1,0 +1,17 @@
+provider "aws" {
+  region = "us-west-1"
+}
+
+data "aws_vpc" "selected" {
+  default = true
+}
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.97.0"
+    }
+  }
+}
+-------------------------------------------------------------------------
