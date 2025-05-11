@@ -1,0 +1,26 @@
+
+ provider "aws" {
+  region = "ap-south-1"
+  alias  = "mumbai"
+}
+
+provider "aws" {
+  region = "us-east-1"
+  alias  = "virginia"
+}
+module "security_group_mumbai" {
+  source  = "./security_group"
+    providers = {
+        aws = aws.mumbai
+	  }
+	    # variables here
+	    }
+
+	    module "ec2_instance_virginia" {
+	      source  = "./EC2"
+	        providers = {
+		    aws = aws.virginia
+		      }
+		        # variables here
+			}
+
