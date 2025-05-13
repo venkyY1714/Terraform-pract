@@ -23,12 +23,13 @@ variable "private_subnet_name" {
 }
 
 variable "az_1" {
-  default = "us-east-1a"
+  default = "ap-south-1a"
 }
 
 variable "az_2" {
-  default = "us-east-1b"
+  default = "ap-south-1b"
 }
+
 
 variable "igw_name" {
   default = "My-IGW"
