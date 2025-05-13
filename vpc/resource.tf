@@ -6,7 +6,7 @@ resource "aws_vpc" "My-vpc" {
   }
 }
 
-# Public Subnet in AZ us-east-1a
+# Public Subnet in AZ ap-south-1a
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.My-vpc.id
   cidr_block              = var.public_subnet_cidr
@@ -17,7 +17,7 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
-# Private Subnet in AZ us-east-1b
+# Private Subnet in AZ ap-south-1b
 resource "aws_subnet" "private_subnet" {
   vpc_id            = aws_vpc.My-vpc.id
   cidr_block        = var.private_subnet_cidr
@@ -35,9 +35,9 @@ resource "aws_internet_gateway" "My-igw" {
   }
 }
 
-# Elastic IP for NAT Gateway
+# Elastic IP for NAT Gateway (updated to use 'domain' instead of deprecated 'vpc')
 resource "aws_eip" "nat_eip" {
-  vpc = true
+  domain = "vpc"
 }
 
 # NAT Gateway in public subnet
