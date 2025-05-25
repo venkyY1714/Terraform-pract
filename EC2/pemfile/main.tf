@@ -1,4 +1,9 @@
 # 1. Generate an RSA key pair
+# 2. Upload the public key to AWS as a key pair
+# 3. Save the private key locally as a .pem file
+
+
+# 1. Generate an RSA key pair
 resource "tls_private_key" "terraform_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
