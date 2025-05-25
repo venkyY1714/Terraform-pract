@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # 1. Generate an RSA key pair
 resource "tls_private_key" "terraform_key" {
   algorithm = "RSA"
