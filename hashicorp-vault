@@ -1,0 +1,55 @@
+
+For Debian based
+
+sudo apt update
+sudo apt install -y wget unzip
+wget https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
+unzip vault_1.15.4_linux_amd64.zip
+sudo mv vault /usr/local/bin/
+vault --version
+
+For RPM based
+
+sudo yum update -y
+sudo yum install -y wget unzip
+wget https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
+unzip vault_1.15.4_linux_amd64.zip
+sudo mv vault /usr/local/bin/
+vault --version
+
+
+Step 2: Start Vault Server (Dev Mode)
+
+vault server -dev
+
+This will output a root token and local address (usually: http://127.0.0.1:8200)
+
+
+Step 3: Export Environment Variables
+Open a new terminal and export:
+
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN='paste_your_token_here'
+
+
+Step 4: Store AWS Credentials
+vault kv put secret/aws access_key=YOUR_ACCESS_KEY secret_key=YOUR_SECRET_KEY
+vault kv get secret/aws
+
+
+
+ Step 5: Use in Terraform
+Refer to this minimal setup:
+
+provider "vault" {}
+
+data "vault_kv_secret_v2" "aws_creds" {
+  mount = "secret"
+  name  = "aws"
+}
+
+provider "aws" {
+  region     = "us-east-1"
+  access_key = data.vault_kv_secret_v2.aws_creds.data["access_key"]
+  secret_key = data.vault_kv_secret_v2.aws_creds.data["secret_key"]
+}
