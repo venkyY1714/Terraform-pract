@@ -1,109 +1,67 @@
+terraform {
+  required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = "~> 3.20.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
-For Debian based
-
-sudo apt update
-sudo apt install -y wget unzip
-wget https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
-unzip vault_1.15.4_linux_amd64.zip
-sudo mv vault /usr/local/bin/
-vault --version
-
-vault server -dev
-
-nohup vault server -dev > vault.log 2>&1 &
-
- ps aux | grep vault
-
-export VAULT_ADDR='http://127.0.0.1:8200'
-export VAULT_TOKEN='hvs.######'
-
-vault secrets enable -path=aws kv
-
-
-vault status
-echo $VAULT_TOKEN
-
-
-
-pkill vault  # kill existing vault
-vault server -dev > vault.log 2>&1 &
-grep 'Root Token' vault.log
-
-
-vault kv put aws/access_key access_key=YOUR_AWS_ACCESS_KEY secret_key=YOUR_AWS_SECRET_KEY
-
-vault kv get aws/access_key
-
-vault kv get aws/creds
-
-Create a vault provider in Terraform so it can talk to Vault and read secrets.
+# Vault provider
 provider "vault" {
   address = "http://127.0.0.1:8200"
-  token   = "hvs#####l"  # your root or appropriate token
+  token   = var.vault_token
 }
 
-Fetch AWS Credentials from Vault Using vault_generic_secret
-Use a Terraform data source to read the secret from Vault:
-
-data "vault_generic_secret" "aws_creds" {
-  path = "aws/creds"
-}
-
-
-Use These Secrets in AWS Provider
-Then, use the retrieved secrets in the AWS provider block:
-
-provider "aws" {
-  region     = "us-east-1"
-  access_key = data.vault_generic_secret.aws_creds.data["access_key"]
-  secret_key = data.vault_generic_secret.aws_creds.data["secret_key"]
-}
-
-
-
-
-For RPM based
-
-sudo yum update -y
-sudo yum install -y wget unzip
-wget https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
-unzip vault_1.15.4_linux_amd64.zip
-sudo mv vault /usr/local/bin/
-vault --version
-
-
-Step 2: Start Vault Server (Dev Mode)
-
-vault server -dev
-
-This will output a root token and local address (usually: http://127.0.0.1:8200)
-
-
-Step 3: Export Environment Variables
-Open a new terminal and export:
-
-export VAULT_ADDR='http://127.0.0.1:8200'
-export VAULT_TOKEN='paste_your_token_here'
-
-
-Step 4: Store AWS Credentials
-vault kv put secret/aws access_key=YOUR_ACCESS_KEY secret_key=YOUR_SECRET_KEY
-vault kv get secret/aws
-
-
-
- Step 5: Use in Terraform
-Refer to this minimal setup:
-
-provider "vault" {}
-
+# Fetch AWS credentials from Vault
 data "vault_kv_secret_v2" "aws_creds" {
-  mount = "secret"
-  name  = "aws"
+  mount = "aws"
+  name  = "creds"
 }
 
+# AWS provider using secrets from Vault
 provider "aws" {
   region     = "us-east-1"
-  access_key = data.vault_kv_secret_v2.aws_creds.data["access_key"]
-  secret_key = data.vault_kv_secret_v2.aws_creds.data["secret_key"]
+  access_key = data.vault_kv_secret_v2.aws_creds.data["access_key_id"]
+  secret_key = data.vault_kv_secret_v2.aws_creds.data["secret_access_key"]
+}
+
+# Use Amazon Linux AMI
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+
+
+
+
+
+
+
+
+var.tf
+
+
+
+
+variable "vault_token" {
+  description = "Vault token to authenticate the Vault provider"
+  type        = string
+  sensitive   = true
+  default     = ""
 }
