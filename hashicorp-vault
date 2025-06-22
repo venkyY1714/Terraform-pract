@@ -1,36 +1,19 @@
-terraform {
-  required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = "~> 3.20.0"
-    }
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# Vault provider
 provider "vault" {
   address = "http://127.0.0.1:8200"
   token   = var.vault_token
 }
 
-# Fetch AWS credentials from Vault
 data "vault_kv_secret_v2" "aws_creds" {
   mount = "aws"
   name  = "creds"
 }
 
-# AWS provider using secrets from Vault
 provider "aws" {
   region     = "us-east-1"
   access_key = data.vault_kv_secret_v2.aws_creds.data["access_key_id"]
   secret_key = data.vault_kv_secret_v2.aws_creds.data["secret_access_key"]
 }
 
-# Use Amazon Linux AMI
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -49,6 +32,16 @@ data "aws_ami" "amazon_linux" {
 
 
 
+vault secrets disable aws
+vault secrets enable -path=aws -version=2 kv
+vault kv put aws/creds access_key_id="" secret_access_key="your-secret-key"
+
+
+vault kv put aws/creds \
+  access_key_id="" \
+  secret_access_key=""
+
+vault kv get aws/creds
 
 
 
