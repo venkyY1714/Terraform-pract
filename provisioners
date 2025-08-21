@@ -1,0 +1,29 @@
+Terraform provisioners are a mechanism within Terraform that allows for the execution of scripts or commands
+on a local machine or a remote resource during the lifecycle of infrastructure provisioning or destruction. 
+They are used to perform tasks that cannot be directly managed by Terraform's declarative language,
+such as installing software, configuring applications or running post-deployment scripts. 
+
+
+localexec:
+local-exec Provisioner: This provisioner executes commands or scripts on the machine where Terraform is being run. 
+This is useful for tasks that do not require interaction with the remote resource, 
+such as generating configuration files or triggering local scripts after infrastructure creation.
+      
+      provisioner "local-exec" {
+        command = "echo 'Terraform applied successfully!' >> local_log.txt"
+      }
+    }
+      
+
+
+remote-exec Provisioner: This provisioner executes commands or scripts on a remote resource after it has been created.
+It typically uses SSH for Linux/Unix systems or WinRM for Windows systems to connect to the remote machine. 
+This is commonly used for tasks like installing software packages, configuring services or running configuration management tools on the provisioned instance.
+
+      provisioner "remote-exec" {
+        inline = [
+          "sudo apt-get update",
+          "sudo apt-get install -y nginx"
+        ]
+      }
+    }
