@@ -2,6 +2,23 @@ name: Terraform CI/CD
 
 on:
   workflow_dispatch:
+    inputs:
+      apply:
+        description: "Do you want to apply the plan?"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      destroy:
+        description: "Do you want to destroy the resources?"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 jobs:
   terraform:
@@ -18,7 +35,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.5 # or your version
+          terraform_version: 1.8.5
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
