@@ -1,4 +1,3 @@
-
 name: Terraform Manual Pipeline
 
 on:
@@ -37,21 +36,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-       # Terraform Init
+      # Terraform Init
       - name: Terraform Init
         working-directory: vpc
         run: terraform init
-        
+
+      # Terraform Format Check
+      - name: Terraform FMT
+        working-directory: vpc
+        run: terraform fmt -check -recursive
+
       # Terraform Validate
       - name: Terraform Validate
         working-directory: vpc
         run: terraform validate
-
-      # Terraform Validate
-      - name: Terraform format
-        working-directory: vpc
-        run: terraform fmt
-
 
       # Terraform Plan
       - name: Terraform Plan
