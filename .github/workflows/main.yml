@@ -46,6 +46,11 @@ jobs:
         working-directory: vpc
         run: terraform validate
 
+      # Terraform Validate
+      - name: Terraform Format
+        working-directory: vpc
+        run: terraform fmt
+
       # Terraform Plan
       - name: Terraform Plan
         working-directory: vpc
