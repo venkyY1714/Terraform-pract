@@ -1,66 +1,37 @@
-name: Terraform Manual Pipeline
+name: Terraform CI/CD
 
 on:
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Choose Terraform Action (plan, apply, destroy)'
-        required: true
-        default: 'plan'
-        type: choice
-        options:
-          - plan
-          - apply
-          - destroy
+  workflow_dispatch: # Manual trigger
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./vpc  # your Terraform directory
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
+          terraform_version: 1.9.5 # or your version
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-
-      # init
       - name: Terraform Init
-        id: init
-        working-directory: vpc
         run: terraform init
 
-      #  Validate 
       - name: Terraform Validate
-        if: success()
-        working-directory: vpc
         run: terraform validate
 
-      - name: Terraform Format
-        if: success()
-        working-directory: vpc
-        run: terraform fmt -check -recursive
-
       - name: Terraform Plan
-        if: ${{ github.event.inputs.action == 'plan' }}
-        working-directory: vpc
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
-        if: ${{ github.event.inputs.action == 'apply' }}
-        working-directory: vpc
+        if: github.event.inputs.action == 'apply'
         run: terraform apply -auto-approve tfplan
 
       - name: Terraform Destroy
-        if: ${{ github.event.inputs.action == 'destroy' }}
-        working-directory: vpc
+        if: github.event.inputs.action == 'destroy'
         run: terraform destroy -auto-approve
