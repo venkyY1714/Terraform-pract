@@ -37,16 +37,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      
+       # Terraform Init
+      - name: Terraform Init
+        working-directory: vpc
+        run: terraform init
+        
       # Terraform Validate
       - name: Terraform Validate
         working-directory: vpc
         run: terraform validate
 
-      # Terraform Init
-      - name: Terraform Init
+      # Terraform Validate
+      - name: Terraform format
         working-directory: vpc
-        run: terraform init
+        run: terraform fmt
+
 
       # Terraform Plan
       - name: Terraform Plan
