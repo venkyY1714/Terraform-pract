@@ -18,17 +18,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.0
 
-      # Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -36,33 +33,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # Terraform Init (must be first Terraform step)
+      # init
       - name: Terraform Init
+        id: init
         working-directory: vpc
         run: terraform init
 
-      # Terraform Format (check mode)
-      - name: Terraform Format
-        working-directory: vpc
-        run: terraform fmt -check -recursive
-
-      # Terraform Validate (after init)
+      #  Validate 
       - name: Terraform Validate
+        if: success()
         working-directory: vpc
         run: terraform validate
 
-      # Terraform Plan
+      - name: Terraform Format
+        if: success()
+        working-directory: vpc
+        run: terraform fmt -check -recursive
+
       - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'plan' }}
         working-directory: vpc
         run: terraform plan -out=tfplan
 
-      # Terraform Apply (Only if action is apply)
       - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: vpc
         run: terraform apply -auto-approve tfplan
 
-      # Terraform Destroy (Only if action is destroy)
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: vpc
