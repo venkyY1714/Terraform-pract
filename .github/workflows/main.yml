@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Choose Terraform Action'
+        description: 'Choose Terraform Action (plan, apply, destroy)'
         required: true
         default: 'plan'
         type: choice
@@ -36,6 +36,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # Terraform FMT Check
+      - name: Terraform FMT
+        working-directory: vpc
+        run: terraform fmt -check -recursive
+
+      # Terraform Validate
+      - name: Terraform Validate
+        working-directory: vpc
+        run: terraform validate
+
       # Terraform Init
       - name: Terraform Init
         working-directory: vpc
@@ -43,22 +53,16 @@ jobs:
 
       # Terraform Plan
       - name: Terraform Plan
-        if: ${{ github.event.inputs.action == 'plan' }}
         working-directory: vpc
         run: terraform plan -out=tfplan
 
-      # Terraform Apply (Direct Apply if no plan exists)
+      # Terraform Apply (Only if action is apply)
       - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'apply' }}
         working-directory: vpc
-        run: |
-          if [ -f tfplan ]; then
-            terraform apply -auto-approve tfplan
-          else
-            terraform apply -auto-approve
-          fi
+        run: terraform apply -auto-approve tfplan
 
-      # Terraform Destroy
+      # Terraform Destroy (Only if action is destroy)
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         working-directory: vpc
