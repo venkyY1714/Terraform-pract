@@ -1,8 +1,3 @@
-variable "myamiid" {
-  description = "passing the amiid"
-  type        = string
-  default     = "d8ef1"
-}
 variable "key-name" {
   description = "giving the key name"
   type        = string
