@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [vpc, EC2]   # 👈 runs for both ./vpc and ./ec2
+        module: [vpc, EC2, EC2-Security_group]   # 👈 runs for both ./vpc and ./ec2
 
     defaults:
       run:
