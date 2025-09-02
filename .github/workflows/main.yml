@@ -8,25 +8,25 @@ on:
         required: true
         default: "false"
         type: choice
-        options:
-          - "true"
-          - "false"
+        options: ["true", "false"]
       destroy:
         description: "Do you want to destroy the resources?"
         required: true
         default: "false"
         type: choice
-        options:
-          - "true"
-          - "false"
+        options: ["true", "false"]
 
 jobs:
   terraform:
-    name: Terraform VPC Workflow
+    name: Terraform ${{ matrix.module }} Workflow
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [vpc, EC2, EC2-security_group]   # 👈 runs for both ./vpc and ./ec2
+
     defaults:
       run:
-        working-directory: ./vpc
+        working-directory: ./${{ matrix.module }}
 
     steps:
       - name: Checkout repository
