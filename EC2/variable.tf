@@ -6,7 +6,7 @@ variable "key-name" {
 variable "myinstype" {
   description = "passing the instance type"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 variable "myaz" {
   description = "availibikty zone for instance"
