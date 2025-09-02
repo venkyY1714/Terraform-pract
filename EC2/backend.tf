@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-
-    bucket  = "statefilestorage8780"
-    key     = "mystatefolder2/terraform.tfstate"
-    region  = "ap-south-1"
-    encrypt = true
+    bucket         = "venky-1234"             # 👈 new bucket
+    key            = "venky123/terraform.tfstate"      # file name inside bucket
+    region         = "ap-south-1"             # must match your AWS region
+    dynamodb_table = "terraform-locks"        # optional (for state locking)
+    encrypt        = true                     # recommended
   }
 }
