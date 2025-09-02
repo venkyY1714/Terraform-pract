@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [vpc, EC2, EC2-security_group]   # 👈 must match exact folder names
+        module: [vpc, EC2]   # 👈 must match exact folder names
 
     defaults:
       run:
